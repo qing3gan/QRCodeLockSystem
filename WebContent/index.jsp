@@ -1,38 +1,38 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<script src="jquery.min.js"></script>
-<script src="jquery.qrcode.min.js"></script>
-<script src="json2.js"></script>
+<jsp:include page="common.jsp"></jsp:include>
+<title>QRCodeLockSystem</title>
 <style type="text/css">
-body {
-	padding: 0px;
-	margin: 0px;
+div {
+	margin: 20px;
 }
 
-div {
-	padding: 10px;
+.backgroud {
+	background-image: url("images/door.jpg");
+	background-repeat: no-repeat;
+	background-size: cover;
 }
 </style>
-<title>QRCodeLockSystem</title>
 </head>
-<body>
+<body class="backgroud">
 	<h3 align="center">用户门禁系统</h3>
-	<div align="center">
-		<form id="input">
-			<label>姓名：</label><input type="text" name="name" id="name" /> <label>密码：</label><input
-				type="password" name="password" id="password" /> <label>身份证：</label><input
-				type="text" name="idcard" id="idcard" />
-		</form>
-		<button onclick="genQRCode()">生成门禁二维码</button>
+	<div class="container">
+		<div class="row">
+			<!-- <span class="col-md-2 col-md-offset-10" id="applyList">申请列表</span> -->
+		</div>
+		<div class="row">
+			<button class="col-md-2 col-md-offset-5" onclick="genQRCode()">生成门禁二维码</button>
+		</div>
+		<div class="row" id="output" align="center"></div>
+		<div class="row" id="isPass" align="center"></div>
 	</div>
-	<div id="output" align="center"></div>
-	<h2 id="isPass" align="center"></h2>
-	<iframe src="Async" style="display: none;"> </iframe>
+	<iframe id="async" src="Async" style="display: none;"> </iframe>
 </body>
+<script src="public/qrcode/jquery.qrcode.min.js"></script>
+<script src="public/json/json2.js"></script>
 <script>
 	// 生成二维码
 	function genQRCode() {
@@ -40,15 +40,23 @@ div {
 		if ($("#output").html() != "") {
 			$("#output").html("");
 		}
-		// 构造json对象
-		var jsonObj = {};
-		jsonObj.name = utf16to8($("#name").val());
-		jsonObj.password = utf16to8($("#password").val());
-		jsonObj.idcard = utf16to8($("#idcard").val());
-		// 将json对象解析为json字符串
-		var jsonStr = JSON.stringify(jsonObj);
-		// 将json字符串转换为二维码
-		$("#output").qrcode(jsonStr);
+		$.post("QRCodeServlet?method=genQRCode", function(userInfo) {
+			if (userInfo != null && userInfo.length != 0) {
+				var jsonArray = [];
+				for (var i = 0; i < userInfo.length; i++) {
+					// 构造json对象
+					var jsonObj = {};
+					jsonObj.idcard = utf16to8(userInfo[i].idcard);
+					jsonObj.name = utf16to8(userInfo[i].name);
+					jsonObj.password = utf16to8(userInfo[i].password);
+					jsonArray.push(jsonObj);
+				}
+				// 将json对象解析为json字符串
+				var jsonStr = JSON.stringify(jsonArray);
+				// 将json字符串转换为二维码
+				$("#output").qrcode(jsonStr);
+			}
+		},"json");// 手动判断返回数据格式类型
 	}
 
 	// utf16 转 utf8编码，用于支持中文二维码的编解码
@@ -70,6 +78,13 @@ div {
 			}
 		}
 		return out;
+	}
+
+	// 审批回调
+	function isAgree(userInfo) {
+		if (confirm("是否同意[" + userInfo.name + "]的门禁申请?")) {
+			$.post("RegistServlet?method=registed", userInfo, function(msg) {});
+		}
 	}
 
 	// 推送回调

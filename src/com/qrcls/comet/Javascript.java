@@ -1,18 +1,18 @@
 package com.qrcls.comet;
 
-import java.io.UnsupportedEncodingException;
-
 /**
  * Javascript
  * 
- * Ìá¹©½«javascriptµÄ·½·¨µ÷ÓÃ²¹È«µ½Ò»¸öscript±êÇ©ÖĞµÄ¹¦ÄÜ
+ * æä¾›å°†javascriptçš„æ–¹æ³•è°ƒç”¨è¡¥å…¨åˆ°ä¸€ä¸ªscriptæ ‡ç­¾ä¸­çš„åŠŸèƒ½
  */
 public class Javascript {
 	private String script;
 
-	public Javascript(String func) {
+	public Javascript(String func, String param) {
+		String function = func + "(" + param + ")";
 		script = "<script type='text/javascript'>" + "\n" + "window.parent."
-				+ func + "\n" + "</script>" + "\n";
+				+ function + "\n" + "</script>" + "\n";
+		System.out.println("ã€è°ƒç”¨JSå›è°ƒå‡½æ•°[" + function + "]ã€‘");
 	}
 
 	public String getScript() {

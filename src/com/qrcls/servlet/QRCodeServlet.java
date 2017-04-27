@@ -1,7 +1,7 @@
 package com.qrcls.servlet;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,9 +11,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.qrcls.comet.ClientComet;
 import com.qrcls.comet.Javascript;
+import com.qrcls.constant.Constant;
+import com.qrcls.entity.MsgInfo;
+import com.qrcls.entity.UserInfo;
+import com.qrcls.util.ResponseUtil;
+import com.qrcls.util.UserPropUtil;
 
 /**
- * ·ÃÎÊ´ËServletÄÜ¹»¸øClientCometµÄmesgQueueÌí¼Ó¶ÔÏó
+ * è®¿é—®æ­¤Servletèƒ½å¤Ÿç»™ClientCometçš„mesgQueueæ·»åŠ å¯¹è±¡
  */
 @WebServlet(urlPatterns = "/QRCodeServlet")
 public class QRCodeServlet extends HttpServlet {
@@ -21,27 +26,51 @@ public class QRCodeServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		String isPassFunc = "isPass";
-		String isPass = request.getParameter("isPass");
-		if ("true".equalsIgnoreCase(isPass)) {
-			ClientComet.getInstance().callClient(
-					new Javascript(isPassFunc+"('Open Success')"));
-		} else if ("false".equalsIgnoreCase(isPass)) {
-			ClientComet.getInstance().callClient(
-					new Javascript(isPassFunc+"('Open Fail')"));
-		} else {
-			ClientComet.getInstance().callClient(
-					new Javascript(isPassFunc+"('Illegal Param')"));
-		}
-		PrintWriter writer = response.getWriter();
-		writer.write("{\"status\":\"1\",\"msg\":\"success\"}");
-		writer.flush();
-		System.out.println("QRCodeServlet-->callClient");
+		doPost(request, response);
 	}
 
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		doGet(request, response);
+		String method = request.getParameter("method");
+		if ("scanQRCode".equals(method)) {
+			scanQRCodeLogic(request, response);
+		} else if ("genQRCode".equals(method)) {
+			genQRCodeLogic(request, response);
+		}
+	}
+
+	private void scanQRCodeLogic(HttpServletRequest request,
+			HttpServletResponse response) {
+		MsgInfo msgInfo = new MsgInfo();
+		String isPassFunc = "isPass";
+		String isPass = request.getParameter("isPass");
+		if ("true".equalsIgnoreCase(isPass)) {
+			Integer openCount = (Integer) request.getServletContext()
+					.getAttribute("openCount");
+			ClientComet.getInstance().callClient(
+					new Javascript(isPassFunc, Constant.MSG_OPEN_SUCC + "+'"
+							+ ++openCount + "æ¬¡'"));
+			request.getServletContext().setAttribute("openCount", openCount);
+			msgInfo.setStatus(Constant.MSG_STATUS_SUCC);
+			msgInfo.setMsg(Constant.MSG_OPEN_SUCC);
+		} else if ("false".equalsIgnoreCase(isPass)) {
+			ClientComet.getInstance().callClient(
+					new Javascript(isPassFunc, Constant.MSG_OPEN_FAIL));
+			msgInfo.setStatus(Constant.MSG_STATUS_FAIL);
+			msgInfo.setMsg(Constant.MSG_OPEN_FAIL);
+		} else {
+			ClientComet.getInstance().callClient(
+					new Javascript(isPassFunc, Constant.MSG_OPEN_ILLEGAL));
+			msgInfo.setStatus(Constant.MSG_STATUS_FAIL);
+			msgInfo.setMsg(Constant.MSG_OPEN_ILLEGAL);
+		}
+		ResponseUtil.write(response, msgInfo);
+	}
+
+	private void genQRCodeLogic(HttpServletRequest request,
+			HttpServletResponse response) {
+		List<UserInfo> userInfos = UserPropUtil.getAllUserInfo();
+		ResponseUtil.write(response, userInfos);
 	}
 
 }

@@ -10,19 +10,19 @@ import javax.servlet.AsyncContext;
 /**
  * ClientComet
  * 
- * ¹ÜÀíÓÃ»§µÄAsyncContext(Ìí¼Ó¡¢É¾³ı)
+ * ç®¡ç†ç”¨æˆ·çš„AsyncContext(æ·»åŠ ã€åˆ é™¤)
  * 
- * Í¨¹ı¿ªÆôÒ»¸öÏß³ÌÀ´²»¶ÏµØ´ÓmesgQueue»ñÈ¡javascript ²¢±éÀúÓÃ»§µÄAsyncContextÀ´°ÉjavascriptÍÆËÍ¸øÃ¿¸öÓÃ»§
+ * é€šè¿‡å¼€å¯ä¸€ä¸ªçº¿ç¨‹æ¥ä¸æ–­åœ°ä»mesgQueueè·å–javascript å¹¶éå†ç”¨æˆ·çš„AsyncContextæ¥å§javascriptæ¨é€ç»™æ¯ä¸ªç”¨æˆ·
  * 
  */
 public class ClientComet {
 	private static ClientComet instance;
 	/**
-	 * ¿Í»§¶ËÒì²½ÉÏÏÂÎÄ¶ÓÁĞ
+	 * å®¢æˆ·ç«¯å¼‚æ­¥ä¸Šä¸‹æ–‡é˜Ÿåˆ—
 	 */
 	private ConcurrentLinkedQueue<AsyncContext> actxQueue;
 	/**
-	 * ÍÆËÍÏûÏ¢¶ÓÁĞ
+	 * æ¨é€æ¶ˆæ¯é˜Ÿåˆ—
 	 */
 	private LinkedBlockingQueue<Javascript> mesgQueue;
 
@@ -48,7 +48,7 @@ public class ClientComet {
 	}
 
 	/**
-	 * ÍÆËÍÏûÏ¢
+	 * æ¨é€æ¶ˆæ¯
 	 * 
 	 * @param javascript
 	 */
@@ -57,7 +57,7 @@ public class ClientComet {
 	}
 
 	/**
-	 *	ÂÖÑ¯Ïß³Ì
+	 * è½®è¯¢çº¿ç¨‹
 	 */
 	protected class ClientCometThread extends Thread {
 
@@ -67,11 +67,12 @@ public class ClientComet {
 				try {
 					Javascript javascript = mesgQueue.take();
 					for (AsyncContext actx : actxQueue) {
+						actx.getResponse().setContentType(
+								"text/html;charset=utf-8");
 						PrintWriter writer = actx.getResponse().getWriter();
 						writer.write(javascript.getScript());
 						writer.flush();
-						System.out
-								.println("ClientCometThread-->sendJavaScript");
+						System.out.println("ã€é•¿è¿æ¥[" + actx + "]å“åº”ã€‘");
 					}
 				} catch (InterruptedException | IOException e) {
 					e.printStackTrace();

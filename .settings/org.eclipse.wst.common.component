@@ -3,6 +3,8 @@
     <wb-module deploy-name="QRCodeLockSystem">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/datasource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/test"/>
         <property name="context-root" value="QRCodeLockSystem"/>
         <property name="java-output-path" value="/QRCodeLockSystem/build/classes"/>
     </wb-module>

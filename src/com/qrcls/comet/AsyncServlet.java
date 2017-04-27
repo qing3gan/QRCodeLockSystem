@@ -10,55 +10,54 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.qrcls.constant.Constant;
+
 /**
  * AsyncServlet
  * 
- * Ö§³ÖÒì²½´¦ÀíµÄServlet Ò³ÃæÖĞÒş²ØµÄiframeÍ¨¹ı·ÃÎÊ´ËServletÀ´½¨Á¢HTTP³¤Á¬½Ó ´Ó¶øºóÌ¨ÄÜÊµÊ±µÄÍÆËÍjavascript´úÂë¸øÒ³Ãæµ÷ÓÃ
+ * æ”¯æŒå¼‚æ­¥å¤„ç†çš„Servlet é¡µé¢ä¸­éšè—çš„iframeé€šè¿‡è®¿é—®æ­¤Servletæ¥å»ºç«‹HTTPé•¿è¿æ¥ ä»è€Œåå°èƒ½å®æ—¶çš„æ¨é€javascriptä»£ç ç»™é¡µé¢è°ƒç”¨
  * 
  */
 @WebServlet(urlPatterns = "/Async", asyncSupported = true)
 public class AsyncServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 822178713133426493L;
-	/**
-	 * ³¬Ê±Ê±¼ä£¨Ğ¡Ê±£©
-	 */
-	private final static int DEFAULT_TIME_OUT = 1 * 60 * 60 * 1000;
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) {
-		// »ñÈ¡Òì²½ÉÏÏÂÎÄ
+		// è·å–å¼‚æ­¥ä¸Šä¸‹æ–‡
 		final AsyncContext actx = req.startAsync();
-		// ÉèÖÃ³¬Ê±Ê±¼ä
-		actx.setTimeout(DEFAULT_TIME_OUT);
-		// Ôö¼ÓÒì²½¼àÌıÊÂ¼ş
+		// è®¾ç½®è¶…æ—¶æ—¶é—´
+		actx.setTimeout(Constant.DEFAULT_TIME_OUT);
+		// å¢åŠ å¼‚æ­¥ç›‘å¬äº‹ä»¶
 		actx.addListener(new AsyncListener() {
 
 			@Override
 			public void onComplete(AsyncEvent arg0) throws IOException {
-				ClientComet.getInstance().removeAsyncContext(actx);
-				System.out.println("AsyncListener-->onComplete");
+//				ClientComet.getInstance().removeAsyncContext(actx);
+				System.out.println("ã€AsyncListener-->onCompleteã€‘");
 			}
 
 			@Override
 			public void onError(AsyncEvent arg0) throws IOException {
-				ClientComet.getInstance().removeAsyncContext(actx);
-				System.out.println("AsyncListener-->onError");
+//				ClientComet.getInstance().removeAsyncContext(actx);
+				System.out.println("ã€AsyncListener-->onErrorã€‘");
 			}
 
 			@Override
 			public void onStartAsync(AsyncEvent arg0) throws IOException {
-				System.out.println("AsyncListener-->onStartAsync");
+				System.out.println("ã€AsyncListener-->onStartAsyncã€‘");
 			}
 
 			@Override
 			public void onTimeout(AsyncEvent arg0) throws IOException {
-				ClientComet.getInstance().removeAsyncContext(actx);
-				System.out.println("AsyncListener-->onTimeout");
+				// onTimeout -> onComplete
+				System.out.println("ã€AsyncListener-->onTimeoutã€‘");
 			}
 
 		});
-		// ¹ÜÀíÒì²½ÉÏÏÂÎÄ²¢¿ªÆôÂÖÑ¯Ïß³Ì
+		// ç®¡ç†å¼‚æ­¥ä¸Šä¸‹æ–‡å¹¶å¼€å¯è½®è¯¢çº¿ç¨‹
 		ClientComet.getInstance().addAsyncContext(actx);
+		System.out.println("ã€é•¿è¿æ¥["+actx+"]å»ºç«‹ã€‘");
 	}
 }
