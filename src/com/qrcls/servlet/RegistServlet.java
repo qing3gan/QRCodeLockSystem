@@ -34,10 +34,10 @@ public class RegistServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		MsgInfo msgInfo = new MsgInfo();
 		String method = request.getParameter("method");
-		UserInfo userInfo = RequestUtil.toUserInfo(request);
 		// 注册中
 		if ("registing".equals(method)) {
 			// 已注册
+			UserInfo userInfo = RequestUtil.toUserInfo(request);// ISO-8859-1
 			if (UserPropUtil.isUserRegisted(userInfo.getIdcard())) {
 				msgInfo.setStatus(Constant.MSG_STATUS_FAIL);
 				msgInfo.setMsg(Constant.MSG_REGIST_FAIL);
@@ -54,6 +54,7 @@ public class RegistServlet extends HttpServlet {
 			}
 		} else if ("registed".equals(method)) {
 			// 审批通过，注册
+			UserInfo userInfo = RequestUtil.toUserInfo2(request);
 			UserPropUtil.addUserInfo(userInfo);
 			msgInfo.setStatus(Constant.MSG_STATUS_SUCC);
 			msgInfo.setMsg(Constant.MSG_REGIST_SUCC);

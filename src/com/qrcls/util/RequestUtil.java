@@ -14,20 +14,37 @@ import com.qrcls.entity.UserInfo;
  */
 public class RequestUtil {
 
+	/**
+	 * JSP-ISO-8859-1
+	 * 
+	 * @param request
+	 * @return
+	 */
 	public static UserInfo toUserInfo(HttpServletRequest request) {
-		String idcard = "";
-		String name = "";
-		String password = "";
+		String idcard = request.getParameter("idcard");
+		String name = request.getParameter("name");
+		String password = request.getParameter("password");
 		try {
-			idcard = new String(request.getParameter("idcard").getBytes(
-					"ISO-8859-1"), "UTF-8");
-			name = new String(request.getParameter("name").getBytes(
-					"ISO-8859-1"), "UTF-8");
-			password = new String(request.getParameter("password").getBytes(
-					"ISO-8859-1"), "UTF-8");
+			idcard = new String(idcard.getBytes("ISO-8859-1"), "UTF-8");
+			name = new String(name.getBytes("ISO-8859-1"), "UTF-8");
+			password = new String(password.getBytes("ISO-8859-1"), "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
+		UserInfo userInfo = new UserInfo(idcard, name, password);
+		return userInfo;
+	}
+
+	/**
+	 * AJAX-UTF8
+	 * 
+	 * @param request
+	 * @return
+	 */
+	public static UserInfo toUserInfo2(HttpServletRequest request) {
+		String idcard = request.getParameter("idcard");
+		String name = request.getParameter("name");
+		String password = request.getParameter("password");
 		UserInfo userInfo = new UserInfo(idcard, name, password);
 		return userInfo;
 	}
